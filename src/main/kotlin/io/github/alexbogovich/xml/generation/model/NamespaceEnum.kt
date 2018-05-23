@@ -31,6 +31,14 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
             "http://www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/hier",
             "www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/hier.xsd", true),
 
+    METRIC_MEM("cbr_MET",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/met",
+            "www.cbr-prototype.com/xbrl/fin/dict/met/met.xsd", true),
+
+    METRIC_HIER("cbr_MET_h",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/met/hier",
+            "www.cbr-prototype.com/xbrl/fin/dict/met/hier.xsd", true),
+
     ;
 
     companion object {

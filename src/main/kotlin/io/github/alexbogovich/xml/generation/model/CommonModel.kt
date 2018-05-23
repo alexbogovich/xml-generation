@@ -44,6 +44,7 @@ enum class XbrlPeriodType(val value: String) {
     DOMAIN_ITEM_TYPE("nonnum:domainItemType"),
     STRING_ITEM_TYPE("xbrli:stringItemType"),
     EXPLICIT_DOMAIN_TYPE("model:explicitDomainType"),
+    MONETARY_ITEM_TYPE("xbrli:monetaryItemType"),
 }
 
 enum class LinkBaseRefType(val arcRole: String, val role: String) {

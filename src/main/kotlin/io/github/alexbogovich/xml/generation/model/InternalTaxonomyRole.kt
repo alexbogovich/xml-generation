@@ -58,5 +58,9 @@ enum class InternalTaxonomyRole(val id: String,
             "http://www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/other/passive",
             NamespaceEnum.ACCOUNT_GROUP_HIER.location),
 
+    MET_ASSET_NF("role_assetOfNationalAndForeignCurrency",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/met/assetOfNationalAndForeignCurrency",
+            NamespaceEnum.METRIC_HIER.location),
+
     NONE("", "", "")
 }

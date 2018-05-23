@@ -34,9 +34,6 @@ object DictContainer {
     lateinit var accountGroupOtherPassive: XsdElement
 
 
-
-
-
     override fun toString(): String {
         return "DictContainer = { incomingBalance = $incomingBalance\n" +
                 "outgoingBalance = $outgoingBalance\n" +
@@ -63,4 +60,10 @@ object AccountGroupCollection {
 
         return accountGroupList
     }
+}
+
+object MetricContainer {
+    lateinit var assetTotal: XsdElement
+    lateinit var assetNationalCurrency: XsdElement
+    lateinit var assetForeignCurrencyOrPreciousMetals: XsdElement
 }

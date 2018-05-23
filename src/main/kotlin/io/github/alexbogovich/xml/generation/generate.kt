@@ -12,6 +12,7 @@ import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.ITEM
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import shared.AccountGroupCollection
 import shared.DictContainer
+import shared.MetricContainer
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -30,11 +31,14 @@ fun main(args: Array<String>) {
     generateDimensionXsd()
     generateAccountGroupDomXsd()
     generateAccountGroupHierXsd()
+    generateMetricXsd()
+    generateMetricHierXsd()
 
 
     generateDefinitionBalanceStatmentHier()
     generateDefaultAccountGroupHierDefinition()
     generateDimensionDefinition()
+    generateMetricDefinition()
 
 //    println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
@@ -399,6 +403,71 @@ fun generateDefaultAccountGroupHierDefinition() {
         definitionLink(InternalTaxonomyRole.AG_OTHER_PASSIVE) {
             writeArrayOfAccounts(DictContainer.accountGroupOtherPassive, DictContainer.accountXsdElements,
                     Account.Group.OTHER, Account.Type.PASSIVE)
+        }
+    }
+}
+
+fun generateMetricXsd() {
+    val metricXsdPath: Path = Paths.get(dirStringPath).resolve(METRIC_MEM.location)
+    metricXsdPath.createIfNotExist()
+    println("open ${metricXsdPath.toAbsolutePath()}")
+    val metricXsdWriter = DslXMLStreamWriter(metricXsdPath)
+    metricXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, METRIC_MEM))
+        defaultNamespace(XSD)
+        targetNamespace(METRIC_MEM)
+        import(listOf(XBRLI, MODEL, NONNUM))
+
+        MetricContainer.assetTotal = xsdElement("AssetTotal") {
+            periodType(INSTANT); type(MONETARY_ITEM_TYPE); substitutionGroup(ITEM); isNillable()
+        }
+
+        MetricContainer.assetNationalCurrency = xsdElement("AssetNationalCurrency") {
+            periodType(INSTANT); type(MONETARY_ITEM_TYPE); substitutionGroup(ITEM); isNillable()
+        }
+
+        MetricContainer.assetForeignCurrencyOrPreciousMetals = xsdElement("AssetForeignCurrencyOrPreciousMetals") {
+            periodType(INSTANT); type(MONETARY_ITEM_TYPE); substitutionGroup(ITEM); isNillable()
+        }
+
+    }
+}
+
+fun generateMetricHierXsd() {
+    val metricXsdPath: Path = Paths.get(dirStringPath).resolve(METRIC_HIER.location)
+    metricXsdPath.createIfNotExist()
+    println("open ${metricXsdPath.toAbsolutePath()}")
+    val metricXsdWriter = DslXMLStreamWriter(metricXsdPath)
+    metricXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, METRIC_HIER))
+        defaultNamespace(XSD)
+        targetNamespace(METRIC_HIER)
+        import(listOf(XBRLI, MODEL))
+
+        appinfo {
+            linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.METRIC_HIER_DEF, path), LinkBaseRefType.DEFINITION)
+            defineRoleList(listOf(InternalTaxonomyRole.MET_ASSET_NF))
+        }
+
+    }
+}
+
+fun generateMetricDefinition() {
+    val metricHierDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.METRIC_HIER_DEF.relatedPath)
+    metricHierDefPath.createIfNotExist()
+
+    println("open ${metricHierDefPath.toAbsolutePath()}")
+    val metricHierDefWriter = DslXMLStreamWriter(metricHierDefPath)
+
+    metricHierDefWriter.linkbase {
+        namespace(listOf(XSI, XLINK, LINK, XBRLDT))
+
+        arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+        roleRef(InternalTaxonomyRole.MET_ASSET_NF, dirPath)
+
+        definitionLink(InternalTaxonomyRole.MET_ASSET_NF) {
+            definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal, MetricContainer.assetNationalCurrency, "1.0")
+            definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
         }
     }
 }
