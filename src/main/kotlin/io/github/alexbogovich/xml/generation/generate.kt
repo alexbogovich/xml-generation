@@ -33,6 +33,7 @@ fun main(args: Array<String>) {
 
 
     generateDefinitionBalanceStatmentHier()
+    generateDimensionDefinition()
 
     println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
@@ -116,10 +117,10 @@ fun generateExplicitDomainXsd() {
         import(listOf(XBRLI, MODEL))
 
         DictContainer.balanceStatementDomain = xsdElement("BalanceStatementDomain") {
-            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT) ;isAbstract(); isNillable();
+            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT); isAbstract(); isNillable();
         }
         DictContainer.accountGroupDomain = xsdElement("AccountGroupDomain") {
-            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT) ;isAbstract(); isNillable();
+            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT); isAbstract(); isNillable();
         }
     }
 }
@@ -190,6 +191,36 @@ fun generateDimensionXsd() {
         DictContainer.accountGroupDimension = xsdElement("AccountGroupDimension") {
             periodType(INSTANT); type(STRING_ITEM_TYPE); substitutionGroup(DIMENSION_ITEM); isAbstract(); isNillable()
         }
+    }
+}
+
+fun generateDimensionDefinition() {
+    val dimensionDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.DIMENSIONS_DEF.relatedPath)
+    dimensionDefPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${dimensionDefPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+
+    println("open ${dimensionDefPath.toAbsolutePath()}")
+    val dimensionDefWriter = DslXMLStreamWriter(dimensionDefPath)
+
+    dimensionDefWriter.linkbase {
+        namespace(listOf(XSI, XLINK, LINK, XBRLDT))
+
+        arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+        roleRef(InternalTaxonomyRole.BS_DOM_IDCO, dirPath)
+        roleRef(InternalTaxonomyRole.AC_SET, dirPath)
+        roleRef(InternalTaxonomyRole.BS_SET, dirPath)
+
+        definitionLink(InternalTaxonomyRole.BS_SET) {
+            definitionArc(DIMENSION_DOMAIN, DictContainer.balanceStatementDimension, DictContainer
+                    .balanceStatementDomain, "1.0", InternalTaxonomyRole.BS_SET)
+        }
+
+
     }
 }
 

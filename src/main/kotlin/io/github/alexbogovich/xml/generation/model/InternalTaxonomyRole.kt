@@ -14,4 +14,5 @@ enum class InternalTaxonomyRole(val id: String,
     AC_SET("role_accountGroupSet",
             "http://www.cbr-prototype.com/xbrl/fin/dict/dim/accountGroupSet",
             NamespaceEnum.DIMENSIONS.location),
+    NONE("", "", "")
 }

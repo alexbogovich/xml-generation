@@ -74,10 +74,14 @@ fun getRelatedHrefWithUnixSlash(startPath: Path, relatedTo: Path) =
     startPath.parent.relativize(relatedTo).toString().replace('\\', '/')
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: XsdElement, to: XsdElement, order: String = "", targetRole:
-RoleRef = RoleRef("", "")): DefinitionArc {
+InternalTaxonomyRole = InternalTaxonomyRole.NONE): DefinitionArc {
     createLocatorsIfMiss(listOf(from, to))
-    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order,
-            targetRole)
+    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order, targetRole.roleUri)
+}
+
+fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
+String): DefinitionArc {
+    return this.definitionArc(arcrole, from.label, to.label, order, targetRole)
 }
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
