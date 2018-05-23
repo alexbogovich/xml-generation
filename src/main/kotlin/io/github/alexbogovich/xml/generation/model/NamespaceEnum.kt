@@ -24,6 +24,13 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
             "http://www.cbr-prototype.com/xbrl/fin/dict/dim",
             "www.cbr-prototype.com/xbrl/fin/dict/dim/dim.xsd", true),
 
+    ACCOUNT_GROUP_MEM("cbr_AG",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup",
+            "www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/mem.xsd", true),
+    ACCOUNT_GROUP_HIER("cbr_AG_h",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/hier",
+            "www.cbr-prototype.com/xbrl/fin/dict/dom/accountGroup/hier.xsd", true),
+
     ;
 
     companion object {

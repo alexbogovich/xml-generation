@@ -10,6 +10,7 @@ import io.github.alexbogovich.xml.generation.model.XbrlPeriodAttr.*
 import io.github.alexbogovich.xml.generation.model.XbrlPeriodType.*
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.*
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
+import shared.AccountGroupCollection
 import shared.DictContainer
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -30,25 +31,21 @@ fun main(args: Array<String>) {
     generateBalanceHierXsd()
     generateExplicitDomainXsd()
     generateDimensionXsd()
+    generateAccountGroupDomXsd()
+    generateAccountGroupHierXsd()
 
 
     generateDefinitionBalanceStatmentHier()
     generateDimensionDefinition()
 
-    println("dict is = $DictContainer")
+//    println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
 }
 
 
 fun generateBalanceDomXsd() {
     val balanceStatementXsdPath: Path = Paths.get(dirStringPath).resolve(BALANCE_STATEMENT_MEM.location)
-    balanceStatementXsdPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${balanceStatementXsdPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    balanceStatementXsdPath.createIfNotExist()
     println("open ${balanceStatementXsdPath.toAbsolutePath()}")
     val balanceStatementXsdWriter = DslXMLStreamWriter(balanceStatementXsdPath)
     balanceStatementXsdWriter.xsdSchema {
@@ -77,13 +74,7 @@ fun generateBalanceDomXsd() {
 
 fun generateBalanceHierXsd() {
     val balanceStatementHierXsdPath: Path = Paths.get(dirStringPath).resolve(BALANCE_STATEMENT_HIER.location)
-    balanceStatementHierXsdPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${balanceStatementHierXsdPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    balanceStatementHierXsdPath.createIfNotExist()
     val balanceStatementHierXsdWriter = DslXMLStreamWriter(balanceStatementHierXsdPath)
 
     balanceStatementHierXsdWriter.xsdSchema {
@@ -101,13 +92,7 @@ fun generateBalanceHierXsd() {
 
 fun generateExplicitDomainXsd() {
     val explicitDomainXsdPath: Path = Paths.get(dirStringPath).resolve(EXPLICIT_DOMAINS.location)
-    explicitDomainXsdPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${explicitDomainXsdPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    explicitDomainXsdPath.createIfNotExist()
     val explicitDomainXsdWriter = DslXMLStreamWriter(explicitDomainXsdPath)
 
     explicitDomainXsdWriter.xsdSchema {
@@ -135,13 +120,7 @@ fun getLinkBaseRefPath(linkbase: LinkbaseEnum, path: Path): String {
 
 fun generateDefinitionBalanceStatmentHier() {
     val xierDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.BALANCE_STATEMENT_HIER_DEF.relatedPath)
-    xierDefPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${xierDefPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    xierDefPath.createIfNotExist()
 
     println("open ${xierDefPath.toAbsolutePath()}")
     val xierDefWriter = DslXMLStreamWriter(xierDefPath)
@@ -158,20 +137,12 @@ fun generateDefinitionBalanceStatmentHier() {
             definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.revenueCredit, "3.0")
             definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.outgoingBalance, "4.0")
         }
-
-
     }
 }
 
 fun generateDimensionXsd() {
     val dimensionsXsdPath: Path = Paths.get(dirStringPath).resolve(DIMENSIONS.location)
-    dimensionsXsdPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${dimensionsXsdPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    dimensionsXsdPath.createIfNotExist()
     val dimensionsXsdWriter = DslXMLStreamWriter(dimensionsXsdPath)
 
     dimensionsXsdWriter.xsdSchema {
@@ -182,7 +153,7 @@ fun generateDimensionXsd() {
 
         appinfo {
             linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.DIMENSIONS_DEF, path), LinkBaseRefType.DEFINITION)
-            defineRoleList(listOf(InternalTaxonomyRole.AC_SET, InternalTaxonomyRole.BS_SET))
+            defineRoleList(listOf(InternalTaxonomyRole.AG_SET, InternalTaxonomyRole.BS_SET))
         }
 
         DictContainer.balanceStatementDimension = xsdElement("BalanceStatementDimension") {
@@ -196,13 +167,7 @@ fun generateDimensionXsd() {
 
 fun generateDimensionDefinition() {
     val dimensionDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.DIMENSIONS_DEF.relatedPath)
-    dimensionDefPath.toFile().run {
-        if (!exists()) {
-            if (!parentFile.exists()) parentFile.mkdirs()
-            println("create ${dimensionDefPath.toAbsolutePath()}")
-            createNewFile()
-        }
-    }
+    dimensionDefPath.createIfNotExist()
 
     println("open ${dimensionDefPath.toAbsolutePath()}")
     val dimensionDefWriter = DslXMLStreamWriter(dimensionDefPath)
@@ -212,7 +177,7 @@ fun generateDimensionDefinition() {
 
         arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
         roleRef(InternalTaxonomyRole.BS_DOM_IDCO, dirPath)
-        roleRef(InternalTaxonomyRole.AC_SET, dirPath)
+        roleRef(InternalTaxonomyRole.AG_SET, dirPath)
         roleRef(InternalTaxonomyRole.BS_SET, dirPath)
 
         definitionLink(InternalTaxonomyRole.BS_SET) {
@@ -221,6 +186,116 @@ fun generateDimensionDefinition() {
         }
 
 
+    }
+}
+
+fun Path.createIfNotExist() {
+    toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+}
+
+fun generateAccountGroupDomXsd() {
+
+    val accountGroups = AccountGroupCollection.getAccountGroups()
+
+    println("accountGroups = $accountGroups")
+
+    val accountGroupXsdPath: Path = Paths.get(dirStringPath).resolve(ACCOUNT_GROUP_MEM.location)
+    accountGroupXsdPath.createIfNotExist()
+    println("open ${accountGroupXsdPath.toAbsolutePath()}")
+    val accountGroupXsdWriter = DslXMLStreamWriter(accountGroupXsdPath)
+    accountGroupXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, ACCOUNT_GROUP_MEM))
+        defaultNamespace(XSD)
+        targetNamespace(ACCOUNT_GROUP_MEM)
+        import(listOf(XBRLI, MODEL, NONNUM))
+
+        DictContainer.totalAccountGroup = xsdElement("TotalAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.balanceAccountGroup = xsdElement("BalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.activeBalanceAccountGroup = xsdElement("ActiveBalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.passiveBalanceAccountGroup = xsdElement("PassiveBalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+
+        DictContainer.trustAccountGroup = xsdElement("TrustAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.activeTrustAccountGroup = xsdElement("ActiveTrustAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.passiveTrustAccountGroup = xsdElement("PassiveTrustAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+
+        DictContainer.offBalanceAccountGroup = xsdElement("OffBalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.activeOffBalanceAccountGroup = xsdElement("ActiveOffBalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.passiveOffBalanceAccountGroup = xsdElement("PassiveOffBalanceAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+
+        DictContainer.otherAccountGroup = xsdElement("OtherAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.activeOtherAccountGroup = xsdElement("ActiveOtherAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.passiveOtherAccountGroup = xsdElement("PassiveOtherAccountGroup") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+
+        DictContainer.accountXsdElements = accountGroups.map {
+            val xsdElement = xsdElement("Account${it.number}") {
+                periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+            }
+            AccountXsdElement(it, xsdElement)
+        }.toList()
+    }
+}
+
+fun generateAccountGroupHierXsd() {
+    val accountGroupHierXsdPath: Path = Paths.get(dirStringPath).resolve(ACCOUNT_GROUP_HIER.location)
+    accountGroupHierXsdPath.createIfNotExist()
+    val accountGroupHierXsdWriter = DslXMLStreamWriter(accountGroupHierXsdPath)
+
+    accountGroupHierXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, ACCOUNT_GROUP_HIER))
+        defaultNamespace(XSD)
+        targetNamespace(ACCOUNT_GROUP_HIER)
+        import(listOf(XBRLI, MODEL))
+
+        appinfo {
+            linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.ACCOUNT_GROUP_HIER_DEF, path), LinkBaseRefType.DEFINITION)
+            defineRoleList(listOf(
+                    InternalTaxonomyRole.AG_TOTAL,
+                    InternalTaxonomyRole.AG_BALANCE,
+                    InternalTaxonomyRole.AG_BALANCE_ACTIVE,
+                    InternalTaxonomyRole.AG_BALANCE_PASSIVE,
+                    InternalTaxonomyRole.AG_TRUST,
+                    InternalTaxonomyRole.AG_TRUST_ACTIVE,
+                    InternalTaxonomyRole.AG_TRUST_PASSIVE,
+                    InternalTaxonomyRole.AG_OFFBALANCE,
+                    InternalTaxonomyRole.AG_OFFBALANCE_ACTIVE,
+                    InternalTaxonomyRole.AG_OFFBALANCE_PASSIVE,
+                    InternalTaxonomyRole.AG_OTHER,
+                    InternalTaxonomyRole.AG_OTHER_ACTIVE,
+                    InternalTaxonomyRole.AG_OTHER_PASSIVE
+                    ))
+        }
     }
 }
 
