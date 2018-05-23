@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
     generateBalanceDomXsd()
     generateBalanceHierXsd()
     generateExplicitDomainXsd()
-
+    generateDimensionXsd()
 
 
     generateDefinitionBalanceStatmentHier()
@@ -159,6 +159,37 @@ fun generateDefinitionBalanceStatmentHier() {
         }
 
 
+    }
+}
+
+fun generateDimensionXsd() {
+    val dimensionsXsdPath: Path = Paths.get(dirStringPath).resolve(DIMENSIONS.location)
+    dimensionsXsdPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${dimensionsXsdPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+    val dimensionsXsdWriter = DslXMLStreamWriter(dimensionsXsdPath)
+
+    dimensionsXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, XBRLDT, MODEL, NONNUM, DIMENSIONS))
+        defaultNamespace(XSD)
+        targetNamespace(DIMENSIONS)
+        import(listOf(XBRLI, XBRLDT, MODEL))
+
+        appinfo {
+            linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.DIMENSIONS_DEF, path), LinkBaseRefType.DEFINITION)
+            defineRoleList(listOf(InternalTaxonomyRole.AC_SET, InternalTaxonomyRole.BS_SET))
+        }
+
+        DictContainer.balanceStatementDimension = xsdElement("BalanceStatementDimension") {
+            periodType(INSTANT); type(STRING_ITEM_TYPE); substitutionGroup(DIMENSION_ITEM); isAbstract(); isNillable()
+        }
+        DictContainer.accountGroupDimension = xsdElement("AccountGroupDimension") {
+            periodType(INSTANT); type(STRING_ITEM_TYPE); substitutionGroup(DIMENSION_ITEM); isAbstract(); isNillable()
+        }
     }
 }
 

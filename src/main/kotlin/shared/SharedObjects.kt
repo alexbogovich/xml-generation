@@ -10,6 +10,8 @@ object DictContainer {
     lateinit var revenueCredit: XsdElement
     lateinit var balanceStatementDomain: XsdElement
     lateinit var accountGroupDomain: XsdElement
+    lateinit var balanceStatementDimension: XsdElement
+    lateinit var accountGroupDimension: XsdElement
 
     override fun toString(): String {
         return "DictContainer = { incomingBalance = $incomingBalance\n" +

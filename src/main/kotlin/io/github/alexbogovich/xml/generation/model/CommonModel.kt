@@ -3,7 +3,8 @@ package io.github.alexbogovich.xml.generation.model
 import java.nio.file.Path
 
 enum class XbrlSubstitutionGroup(val value: String) {
-    ITEM("xbrli:item")
+    ITEM("xbrli:item"),
+    DIMENSION_ITEM("xbrldt:dimensionItem")
 }
 
 data class XsdElement(val id: String, val name: String, val xsdPath: Path, val xsdNamespace: String)
@@ -38,6 +39,7 @@ enum class XbrlPeriodAttr(val value: String) {
 
 enum class XbrlPeriodType(val value: String) {
     DOMAIN_ITEM_TYPE("nonnum:domainItemType"),
+    STRING_ITEM_TYPE("xbrli:stringItemType"),
     EXPLICIT_DOMAIN_TYPE("model:explicitDomainType"),
 }
 

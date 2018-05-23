@@ -6,6 +6,7 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
     XLINK("xlink", "http://www.w3.org/1999/xlink", ""),
     LINK("link", "http://www.xbrl.org/2003/linkbase", ""),
     XBRLI("xbrli", "http://www.xbrl.org/2003/instance", "http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"),
+    XBRLDT("xbrldt", "http://xbrl.org/2005/xbrldt", "http://www.xbrl.org/2005/xbrldt-2005.xsd"),
     MODEL("model", "http://www.eurofiling.info/xbrl/ext/model", "http://www.eurofiling.info/eu/fr/xbrl/ext/model.xsd"),
     NONNUM("nonnum",
             "http://www.xbrl.org/dtr/type/non-numeric",
@@ -18,7 +19,12 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
     "www.cbr-prototype.com/xbrl/fin/dict/dom/balanceStatement/hier.xsd", true),
     EXPLICIT_DOMAINS("cbr_exp",
     "http://www.cbr-prototype.com/xbrl/fin/dict/exp",
-    "www.cbr-prototype.com/xbrl/fin/dict/dom/exp.xsd", true),;
+    "www.cbr-prototype.com/xbrl/fin/dict/dom/exp.xsd", true),
+    DIMENSIONS("cbr_dim",
+            "http://www.cbr-prototype.com/xbrl/fin/dict/dim",
+            "www.cbr-prototype.com/xbrl/fin/dict/dim/dim.xsd", true),
+
+    ;
 
     companion object {
         fun getByLink(link: String): NamespaceEnum {
