@@ -13,6 +13,7 @@ dependencies {
 
 repositories {
     jcenter()
+    mavenLocal()
 }
 
 group = "io.github.alexbogovich"
