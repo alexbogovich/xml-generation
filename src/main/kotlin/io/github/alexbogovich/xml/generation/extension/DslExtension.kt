@@ -1,9 +1,11 @@
 package io.github.alexbogovich.xml.generation.extension
 
+import utils.getLinkBaseRefPath
 import io.github.alexbogovich.xml.generation.model.*
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import io.github.alexbogovich.xml.writer.dsl.EmptyElementDsl
 import shared.LocationContainer
+import utils.getRelatedHrefWithUnixSlash
 import java.nio.file.Path
 
 fun DslXMLStreamWriter.xsdSchema(lambda: DslXMLStreamWriter.() -> Unit) {
@@ -75,9 +77,6 @@ fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<Element>) {
     }
 }
 
-fun getRelatedHrefWithUnixSlash(startPath: Path, relatedTo: Path) =
-    startPath.parent.relativize(relatedTo).toString().replace('\\', '/')
-
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Element, to: Element, order: String = "", targetRole:
 InternalTaxonomyRole = InternalTaxonomyRole.NONE): DefinitionArc {
     createLocatorsIfMiss(listOf(from, to))
@@ -92,17 +91,6 @@ String): DefinitionArc {
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
 RoleRef = RoleRef("", "")): DefinitionArc {
     return this.definitionArc(arcrole, from.label, to.label, order, targetRole.roleURI)
-}
-
-@Deprecated(message = "remove id")
-fun DslXMLStreamWriter.definitionLink(role: RoleRef, id: String, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
-    "link:definitionLink" {
-        "xlink:type" attr "extended"
-        "xlink:role" attr role.roleURI
-        "id" attr id
-        this.lambda()
-    }
-    return DefinitionLink(role.roleURI, id)
 }
 
 fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
@@ -123,20 +111,16 @@ fun DslXMLStreamWriter.addListOfRoleRef(taxonomyRoleList: List<InternalTaxonomyR
 }
 
 fun DslXMLStreamWriter.roleRef(taxonomyRole: InternalTaxonomyRole, buildPath: Path): RoleRef {
-    val xsdWithRulePath = buildPath.resolve(taxonomyRole.taxomomyPath)
-    val href = getRelatedHrefWithUnixSlash(path, xsdWithRulePath)
+    val href = buildPath.resolve(taxonomyRole.taxomomyPath)
+            .let { getRelatedHrefWithUnixSlash(path, it) }
+            .let { "$it#${taxonomyRole.id}" }
 
-    return roleRef("$href#${taxonomyRole.id}", taxonomyRole.roleUri)
-}
-
-@Deprecated(message = "use InternalTaxonomyRole")
-fun DslXMLStreamWriter.roleRef(href: String, roleURI: String): RoleRef {
     "link:roleRef" emptyElement  {
         "xlink:type" attr "simple"
         "xlink:href" attr href
-        "roleURI" attr roleURI
+        "roleURI" attr taxonomyRole.roleUri
     }
-    return RoleRef(href, roleURI)
+    return RoleRef(href, taxonomyRole.roleUri)
 }
 
 fun DslXMLStreamWriter.writeArrayOfAccounts(domain: XsdElement, accounts: List<AccountXsdElement>, group: Account.Group, type: Account
@@ -144,15 +128,6 @@ fun DslXMLStreamWriter.writeArrayOfAccounts(domain: XsdElement, accounts: List<A
     accounts.asSequence()
             .filter { it.account.group == group && it.account.type == type }
             .map { it.xsdElement }
-            .forEachIndexed { index, location ->
-                definitionArc(ArcRole.DOMAIN_MEMBER, domain, location, "${index + 1}.0")
-            }
-}
-
-fun DslXMLStreamWriter.writeArrayOfAccounts(domain: Location, accounts: List<Account>, group: Account.Group, type: Account.Type) {
-    accounts.asSequence()
-            .filter { it.group == group && it.type == type }
-            .map { location("account.xsd#account-list_Account${it.number}", "Account${it.number}") }
             .forEachIndexed { index, location ->
                 definitionArc(ArcRole.DOMAIN_MEMBER, domain, location, "${index + 1}.0")
             }
@@ -255,4 +230,14 @@ fun EmptyElementDsl.isNillable() {
 
 fun EmptyElementDsl.isAbstract() {
     "abstract" attr "true"
+}
+
+fun DslXMLStreamWriter.defaultDomainItem(name: String): XsdElement {
+    return xsdElement(name) {
+        periodType(XbrlPeriodAttr.INSTANT); type(XbrlPeriodType.DOMAIN_ITEM_TYPE); substitutionGroup(XbrlSubstitutionGroup.ITEM); isNillable(); isAbstract()
+    }
+}
+
+fun DslXMLStreamWriter.linkbaseRef(def: LinkbaseEnum, type: LinkBaseRefType) {
+    linkbaseRef(getLinkBaseRefPath(def, path), type)
 }

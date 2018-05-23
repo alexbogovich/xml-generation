@@ -69,6 +69,7 @@ object MetricContainer {
 
 object SharedConstants {
     const val initDate = "2018-05-23"
+    const val taxonomyPath = "www.cbr-prototype.com/xbrl/fin"
 }
 
 object ExternalElemensts {
