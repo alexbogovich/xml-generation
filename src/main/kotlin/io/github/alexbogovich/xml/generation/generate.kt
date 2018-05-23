@@ -33,12 +33,14 @@ fun main(args: Array<String>) {
     generateAccountGroupHierXsd()
     generateMetricXsd()
     generateMetricHierXsd()
+    genenrateForm101Xsd()
 
 
     generateDefinitionBalanceStatmentHier()
     generateDefaultAccountGroupHierDefinition()
     generateDimensionDefinition()
     generateMetricDefinition()
+    genenrateForm101Definistion()
 
 //    println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
@@ -113,11 +115,9 @@ fun generateExplicitDomainXsd() {
 }
 
 fun getLinkBaseRefPath(linkbase: LinkbaseEnum, path: Path): String {
-    val linkbasePath = Paths.get(dirStringPath).resolve(linkbase.relatedPath)
-    println("calculate related path from $linkbasePath to $path")
-    val result = path.parent.relativize(linkbasePath)
-    println("result = $result")
-    return result.toString()
+    return Paths.get(dirStringPath)
+            .resolve(linkbase.relatedPath)
+            .let { getRelatedHrefWithUnixSlash(path, it) }
 }
 
 fun generateDefinitionBalanceStatmentHier() {
@@ -197,7 +197,7 @@ fun generateDimensionDefinition() {
     }
 }
 
-fun Path.createIfNotExist() {
+fun Path.createIfNotExist(): Path {
     toFile().run {
         if (!exists()) {
             if (!parentFile.exists()) parentFile.mkdirs()
@@ -205,6 +205,7 @@ fun Path.createIfNotExist() {
             createNewFile()
         }
     }
+    return this
 }
 
 fun generateAccountGroupDomXsd() {
@@ -300,7 +301,7 @@ fun generateAccountGroupHierXsd() {
                     InternalTaxonomyRole.AG_OTHER,
                     InternalTaxonomyRole.AG_OTHER_ACTIVE,
                     InternalTaxonomyRole.AG_OTHER_PASSIVE
-                    ))
+            ))
         }
     }
 }
@@ -470,4 +471,48 @@ fun generateMetricDefinition() {
             definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
         }
     }
+}
+
+fun genenrateForm101Xsd() {
+    val form101XsdPath: Path = Paths.get(dirStringPath).resolve(FORM_101.location)
+    form101XsdPath.createIfNotExist()
+    println("open ${form101XsdPath.toAbsolutePath()}")
+    val form101XsdWriter = DslXMLStreamWriter(form101XsdPath)
+    form101XsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, FORM_101))
+        defaultNamespace(XSD)
+        targetNamespace(FORM_101)
+        import(listOf(XBRLI, MODEL))
+
+        appinfo {
+            linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.FORM_101_DEF, path), LinkBaseRefType.DEFINITION)
+            defineRoleList(listOf(InternalTaxonomyRole.MAIN_ROLE_FORM_101))
+        }
+    }
+}
+
+fun genenrateForm101Definistion() {
+    Paths.get(dirStringPath)
+            .resolve(LinkbaseEnum.FORM_101_DEF.relatedPath)
+            .createIfNotExist()
+            .let { path: Path -> DslXMLStreamWriter(path) }
+            .linkbase {
+                namespace(listOf(XSI, XLINK, LINK, XBRLDT))
+
+                arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+                arcroleRef(ArcroleRef.ALL)
+                arcroleRef(ArcroleRef.HYPERCUBE_DIMENSION)
+
+                roleRef(InternalTaxonomyRole.MAIN_ROLE_FORM_101, dirPath)
+                roleRef(InternalTaxonomyRole.AG_SET, dirPath)
+                roleRef(InternalTaxonomyRole.BS_SET, dirPath)
+                roleRef(InternalTaxonomyRole.MET_ASSET_NF, dirPath)
+
+                definitionLink(InternalTaxonomyRole.MAIN_ROLE_FORM_101) {
+                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal,
+                            MetricContainer.assetNationalCurrency, "1.0")
+                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal,
+                            MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
+                }
+            }
 }

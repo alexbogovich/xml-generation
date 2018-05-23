@@ -1,5 +1,7 @@
 package io.github.alexbogovich.xml.generation.model
 
+import shared.SharedConstants
+
 enum class InternalTaxonomyRole(val id: String,
                                 val roleUri: String,
                                 val taxomomyPath: String,
@@ -61,6 +63,10 @@ enum class InternalTaxonomyRole(val id: String,
     MET_ASSET_NF("role_assetOfNationalAndForeignCurrency",
             "http://www.cbr-prototype.com/xbrl/fin/dict/met/assetOfNationalAndForeignCurrency",
             NamespaceEnum.METRIC_HIER.location),
+
+    MAIN_ROLE_FORM_101("role_form_101",
+            "http://www.cbr-prototype.com/xbrl/fin/rep/${SharedConstants.initDate}/tab/form_101",
+            NamespaceEnum.FORM_101.location),
 
     NONE("", "", "")
 }

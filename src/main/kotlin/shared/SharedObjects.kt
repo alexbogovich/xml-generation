@@ -2,12 +2,11 @@ package shared
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import io.github.alexbogovich.xml.generation.model.Account
-import io.github.alexbogovich.xml.generation.model.AccountXsdElement
-import io.github.alexbogovich.xml.generation.model.Location
-import io.github.alexbogovich.xml.generation.model.XsdElement
+import io.github.alexbogovich.xml.generation.model.*
+import io.github.alexbogovich.xml.generation.model.NamespaceEnum.*
 import java.io.File
 import java.io.FileReader
+import java.net.URI
 
 object DictContainer {
     lateinit var incomingBalance: XsdElement
@@ -66,4 +65,12 @@ object MetricContainer {
     lateinit var assetTotal: XsdElement
     lateinit var assetNationalCurrency: XsdElement
     lateinit var assetForeignCurrencyOrPreciousMetals: XsdElement
+}
+
+object SharedConstants {
+    const val initDate = "2018-05-23"
+}
+
+object ExternalElemensts {
+    val hyp = ExternalXsdElement("hyp", "hyp", MODEL.location, MODEL.link)
 }

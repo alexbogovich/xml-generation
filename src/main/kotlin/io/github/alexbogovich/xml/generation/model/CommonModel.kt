@@ -11,6 +11,8 @@ data class XsdElement(val id: String, val name: String, val xsdPath: Path, val x
 
 data class AccountXsdElement(val account: Account, val xsdElement: XsdElement)
 
+data class ExternalXsdElement(val id: String, val name: String, val uri: String, val xsdNamespace: String)
+
 enum class ArcRole(val url: String) {
     DOMAIN_MEMBER("http://xbrl.org/int/dim/arcrole/domain-member"),
     DIMENSION_DOMAIN("http://xbrl.org/int/dim/arcrole/dimension-domain")

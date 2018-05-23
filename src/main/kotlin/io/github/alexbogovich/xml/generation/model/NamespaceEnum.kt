@@ -1,5 +1,7 @@
 package io.github.alexbogovich.xml.generation.model
 
+import shared.SharedConstants
+
 enum class NamespaceEnum(val prefix: String, val link: String, val location: String, val internal: Boolean = false) {
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"),
     XSD("xsd", "http://www.w3.org/2001/XMLSchema", ""),
@@ -38,6 +40,10 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
     METRIC_HIER("cbr_MET_h",
             "http://www.cbr-prototype.com/xbrl/fin/dict/met/hier",
             "www.cbr-prototype.com/xbrl/fin/dict/met/hier.xsd", true),
+
+    FORM_101("form_101",
+            "http://www.cbr-prototype.com/xbrl/fin/rep/${SharedConstants.initDate}/tab/form_101",
+            "www.cbr-prototype.com/xbrl/fin/rep/${SharedConstants.initDate}/tab/form_101/form_101.xsd", true),
 
     ;
 
