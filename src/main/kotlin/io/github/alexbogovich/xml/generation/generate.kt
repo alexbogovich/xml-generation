@@ -10,45 +10,120 @@ import io.github.alexbogovich.xml.generation.model.XbrlPeriodAttr.*
 import io.github.alexbogovich.xml.generation.model.XbrlPeriodType.*
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.*
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
+import shared.DictContainer
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.xml.stream.XMLOutputFactory
 
+var dirStringPath = System.getProperty("user.dir")!! + "\\build\\schema"
 
 fun main(args: Array<String>) {
+    if (args.isNotEmpty()) {
+        dirStringPath = args[0]
+    }
+
     generateBalanceDomXsd()
+    generateBalanceHierXsd()
+    generateExplicitDomainXsd()
+
+    println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
 }
 
 
 fun generateBalanceDomXsd() {
-    val balanceStatementXsdPath: Path = Paths.get("/home/alex/Documents/balanceDom.xsd")
-    println("create ${balanceStatementXsdPath.toAbsolutePath()}")
+    val balanceStatementXsdPath: Path = Paths.get(dirStringPath).resolve(BALANCE_STATEMENT_MEM.location)
+    balanceStatementXsdPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${balanceStatementXsdPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+    println("open ${balanceStatementXsdPath.toAbsolutePath()}")
     val balanceStatementXsdWriter = DslXMLStreamWriter(balanceStatementXsdPath)
     balanceStatementXsdWriter.xsdSchema {
-        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM))
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, BALANCE_STATEMENT_MEM))
         defaultNamespace(XSD)
-        targetNamespace(XSD)
+        targetNamespace(BALANCE_STATEMENT_MEM)
         import(listOf(XBRLI, MODEL, NONNUM))
 
-        val incomingBalance = xsdElement("IncomingBalance") {
+        DictContainer.incomingBalance = xsdElement("IncomingBalance") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
-        val outgoingBalance = xsdElement("OutgoingBalance") {
+        DictContainer.outgoingBalance = xsdElement("OutgoingBalance") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
-        val revenueDebit = xsdElement("RevenueDebit") {
+        DictContainer.revenueDebit = xsdElement("RevenueDebit") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
-        val revenueCredit = xsdElement("RevenueCredit") {
+        DictContainer.revenueCredit = xsdElement("RevenueCredit") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
     }
+}
+
+fun generateBalanceHierXsd() {
+    val balanceStatementHierXsdPath: Path = Paths.get(dirStringPath).resolve(BALANCE_STATEMENT_HIER.location)
+    balanceStatementHierXsdPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${balanceStatementHierXsdPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+    val balanceStatementHierXsdWriter = DslXMLStreamWriter(balanceStatementHierXsdPath)
+
+    balanceStatementHierXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, BALANCE_STATEMENT_HIER))
+        defaultNamespace(XSD)
+        targetNamespace(BALANCE_STATEMENT_HIER)
+        import(listOf(XBRLI, MODEL))
+
+        appinfo {
+            linkbaseRef(getLinkBaseRefPath(LinkbaseEnum.BALANCE_STATEMENT_HIER_DEF, path), LinkBaseRefType.DEFINITION)
+            defineRoleList(listOf(InternalTaxonomyRole.BS_DOM_IDCO))
+        }
+    }
+}
+
+fun generateExplicitDomainXsd() {
+    val explicitDomainXsdPath: Path = Paths.get(dirStringPath).resolve(EXPLICIT_DOMAINS.location)
+    explicitDomainXsdPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${explicitDomainXsdPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+    val explicitDomainXsdWriter = DslXMLStreamWriter(explicitDomainXsdPath)
+
+    explicitDomainXsdWriter.xsdSchema {
+        namespace(listOf(XSI, XLINK, LINK, XBRLI, MODEL, NONNUM, EXPLICIT_DOMAINS))
+        defaultNamespace(XSD)
+        targetNamespace(EXPLICIT_DOMAINS)
+        import(listOf(XBRLI, MODEL))
+
+        DictContainer.balanceStatementDomain = xsdElement("BalanceStatementDomain") {
+            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT) ;isAbstract(); isNillable();
+        }
+        DictContainer.accountGroupDomain = xsdElement("AccountGroupDomain") {
+            substitutionGroup(ITEM); type(EXPLICIT_DOMAIN_TYPE); periodType(INSTANT) ;isAbstract(); isNillable();
+        }
+    }
+}
+
+fun getLinkBaseRefPath(linkbase: LinkbaseEnum, path: Path): String {
+    val linkbasePath = Paths.get(dirStringPath).resolve(linkbase.relatedPath)
+    println("calculate related path from $linkbasePath to $path")
+    val result = path.parent.relativize(linkbasePath)
+    println("result = $result")
+    return result.toString()
 }
 
 fun generateDefinitionForAccountXsd() {

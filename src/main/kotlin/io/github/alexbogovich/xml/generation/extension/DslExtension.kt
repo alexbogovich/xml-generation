@@ -122,9 +122,40 @@ fun DslXMLStreamWriter.xsdElement(name: String, lambda: EmptyElementDsl.() -> Un
 
 fun DslXMLStreamWriter.xsdElement(id: String, name: String, lambda: EmptyElementDsl.() -> Unit): XsdElement {
     "element" emptyElement {
+        "id" attr id
+        "name" attr name
         this.lambda()
     }
     return XsdElement(id, name, path, schemaNamespace)
+}
+
+fun DslXMLStreamWriter.linkbaseRef(href: String, type: LinkBaseRefType) {
+    "link:linkbaseRef" emptyElement {
+        "xlink:href" attr href
+        "xlink:type" attr "simple"
+        "xlink:arcrole" attr type.arcRole
+        "xlink:role" attr type.role
+    }
+}
+
+fun DslXMLStreamWriter.defineRoleList(list:List<InternalTaxonomyRole>) {
+    list.forEach {
+        "link:roleType" {
+            "roleURI" attr it.roleName
+            "id" attr it.id
+            if (it.defLink) {
+                "link:usedOn"("link:definitionLink")
+            }
+        }
+    }
+}
+
+fun DslXMLStreamWriter.appinfo(lambda: DslXMLStreamWriter.() -> Unit) {
+    "annotation" {
+        "appinfo" {
+            this.lambda()
+        }
+    }
 }
 
 fun EmptyElementDsl.periodType(period: XbrlPeriodAttr) {
@@ -136,7 +167,7 @@ fun EmptyElementDsl.type(type: XbrlPeriodType) {
 }
 
 fun EmptyElementDsl.type(type: String) {
-    "xbrli:periodType" attr type
+    "type" attr type
 }
 
 fun EmptyElementDsl.substitutionGroup(type: XbrlSubstitutionGroup) {
