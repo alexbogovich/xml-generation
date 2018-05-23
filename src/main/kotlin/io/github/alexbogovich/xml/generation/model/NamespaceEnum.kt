@@ -1,8 +1,8 @@
 package io.github.alexbogovich.xml.generation.model
 
-import shared.SharedConstants
-import shared.SharedConstants.initDate
-import shared.SharedConstants.taxonomyPath
+import io.github.alexbogovich.xml.generation.shared.SharedConstants
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.initDate
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.taxonomyPath
 
 enum class NamespaceEnum(val prefix: String, val link: String, val location: String, val internal: Boolean = false) {
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"),

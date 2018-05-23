@@ -9,11 +9,11 @@ import io.github.alexbogovich.xml.generation.model.XbrlPeriodAttr.INSTANT
 import io.github.alexbogovich.xml.generation.model.XbrlPeriodType.*
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.DIMENSION_ITEM
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.ITEM
-import shared.AccountGroupCollection
-import shared.DictContainer
-import shared.ExternalElemensts
-import shared.MetricContainer
-import utils.getDslSteamWriter
+import io.github.alexbogovich.xml.generation.shared.AccountGroupCollection
+import io.github.alexbogovich.xml.generation.shared.DictContainer
+import io.github.alexbogovich.xml.generation.shared.ExternalElemensts
+import io.github.alexbogovich.xml.generation.shared.MetricContainer
+import io.github.alexbogovich.xml.generation.utils.getDslSteamWriter
 import java.nio.file.Path
 import java.nio.file.Paths
 

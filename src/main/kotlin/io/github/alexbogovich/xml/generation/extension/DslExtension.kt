@@ -1,11 +1,11 @@
 package io.github.alexbogovich.xml.generation.extension
 
-import utils.getLinkBaseRefPath
+import io.github.alexbogovich.xml.generation.utils.getLinkBaseRefPath
 import io.github.alexbogovich.xml.generation.model.*
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import io.github.alexbogovich.xml.writer.dsl.EmptyElementDsl
-import shared.LocationContainer
-import utils.getRelatedHrefWithUnixSlash
+import io.github.alexbogovich.xml.generation.shared.LocationContainer
+import io.github.alexbogovich.xml.generation.utils.getRelatedHrefWithUnixSlash
 import java.nio.file.Path
 
 fun DslXMLStreamWriter.xsdSchema(lambda: DslXMLStreamWriter.() -> Unit) {

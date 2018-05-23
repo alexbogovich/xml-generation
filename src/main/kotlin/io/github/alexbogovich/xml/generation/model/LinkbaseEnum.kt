@@ -1,8 +1,8 @@
 package io.github.alexbogovich.xml.generation.model
 
-import shared.SharedConstants
-import shared.SharedConstants.initDate
-import shared.SharedConstants.taxonomyPath
+import io.github.alexbogovich.xml.generation.shared.SharedConstants
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.initDate
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.taxonomyPath
 
 enum class LinkbaseEnum(val relatedPath: String) {
     BALANCE_STATEMENT_HIER_DEF("$taxonomyPath/dict/dom/balanceStatement/hier-def.xml"),

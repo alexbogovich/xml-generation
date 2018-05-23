@@ -1,7 +1,7 @@
 package io.github.alexbogovich.xml.generation.model
 
-import shared.SharedConstants.initDate
-import shared.SharedConstants.taxonomyPath
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.initDate
+import io.github.alexbogovich.xml.generation.shared.SharedConstants.taxonomyPath
 
 enum class InternalTaxonomyRole(val id: String,
                                 val roleUri: String,

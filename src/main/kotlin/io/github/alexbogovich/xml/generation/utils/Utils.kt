@@ -1,4 +1,4 @@
-package utils
+package io.github.alexbogovich.xml.generation.utils
 
 import io.github.alexbogovich.xml.generation.dirStringPath
 import io.github.alexbogovich.xml.generation.model.LinkbaseEnum

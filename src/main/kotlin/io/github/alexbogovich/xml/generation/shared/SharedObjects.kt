@@ -1,4 +1,4 @@
-package shared
+package io.github.alexbogovich.xml.generation.shared
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
