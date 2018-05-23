@@ -2,8 +2,7 @@ package io.github.alexbogovich.xml.generation
 
 import io.github.alexbogovich.xml.generation.extension.*
 import io.github.alexbogovich.xml.generation.model.*
-import io.github.alexbogovich.xml.generation.model.ArcRole.DIMENSION_DOMAIN
-import io.github.alexbogovich.xml.generation.model.ArcRole.DOMAIN_MEMBER
+import io.github.alexbogovich.xml.generation.model.ArcRole.*
 import io.github.alexbogovich.xml.generation.model.NamespaceEnum.*
 import io.github.alexbogovich.xml.generation.model.XbrlPeriodAttr.INSTANT
 import io.github.alexbogovich.xml.generation.model.XbrlPeriodType.*
@@ -12,6 +11,7 @@ import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.ITEM
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import shared.AccountGroupCollection
 import shared.DictContainer
+import shared.ExternalElemensts
 import shared.MetricContainer
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
     generateDefaultAccountGroupHierDefinition()
     generateDimensionDefinition()
     generateMetricDefinition()
-    genenrateForm101Definistion()
+    genenrateForm101Definition()
 
 //    println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
@@ -491,7 +491,7 @@ fun genenrateForm101Xsd() {
     }
 }
 
-fun genenrateForm101Definistion() {
+fun genenrateForm101Definition() {
     Paths.get(dirStringPath)
             .resolve(LinkbaseEnum.FORM_101_DEF.relatedPath)
             .createIfNotExist()
@@ -509,10 +509,12 @@ fun genenrateForm101Definistion() {
                 roleRef(InternalTaxonomyRole.MET_ASSET_NF, dirPath)
 
                 definitionLink(InternalTaxonomyRole.MAIN_ROLE_FORM_101) {
-                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal,
-                            MetricContainer.assetNationalCurrency, "1.0")
-                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal,
-                            MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
+                    definitionArc(HYPERCUBE_DIMENSION, ExternalElemensts.hyp,
+                            DictContainer.accountGroupDimension, "1.0", InternalTaxonomyRole.AG_SET)
+                    definitionArc(HYPERCUBE_DIMENSION, ExternalElemensts.hyp,
+                            DictContainer.balanceStatementDimension, "2.0", InternalTaxonomyRole.BS_SET)
+                    definitionArc(HYPERCUBE_ALL, MetricContainer.assetTotal,
+                            ExternalElemensts.hyp, "1.0", InternalTaxonomyRole.MET_ASSET_NF)
                 }
             }
 }

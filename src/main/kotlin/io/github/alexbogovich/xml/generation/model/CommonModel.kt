@@ -7,15 +7,20 @@ enum class XbrlSubstitutionGroup(val value: String) {
     DIMENSION_ITEM("xbrldt:dimensionItem")
 }
 
-data class XsdElement(val id: String, val name: String, val xsdPath: Path, val xsdNamespace: String)
+sealed class Element(open val id: String, open val name: String)
+
+data class XsdElement(override val id: String, override val name: String, val xsdPath: Path, val xsdNamespace:
+String): Element(id, name)
 
 data class AccountXsdElement(val account: Account, val xsdElement: XsdElement)
 
-data class ExternalXsdElement(val id: String, val name: String, val uri: String, val xsdNamespace: String)
+data class ExternalXsdElement(override val id: String, override val name: String, val uri: String, val xsdNamespace: String): Element(id, name)
 
 enum class ArcRole(val url: String) {
     DOMAIN_MEMBER("http://xbrl.org/int/dim/arcrole/domain-member"),
-    DIMENSION_DOMAIN("http://xbrl.org/int/dim/arcrole/dimension-domain")
+    DIMENSION_DOMAIN("http://xbrl.org/int/dim/arcrole/dimension-domain"),
+    HYPERCUBE_DIMENSION("http://xbrl.org/int/dim/arcrole/hypercube-dimension"),
+    HYPERCUBE_ALL("http://xbrl.org/int/dim/arcrole/all"),
 }
 
 enum class ArcroleRef(val arcroleURI: String, val href: String) {

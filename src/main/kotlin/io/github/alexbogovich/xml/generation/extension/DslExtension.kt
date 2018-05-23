@@ -56,14 +56,19 @@ String = ""): DefinitionArc {
         "xlink:to" attr to
         if (!order.isEmpty()) "order" attr order
         if (!targetRole.isEmpty()) "xbrldt:targetRole" attr targetRole
+        if (arcrole == ArcRole.HYPERCUBE_ALL) "xbrldt:contextElement" attr "scenario"
     }
     return DefinitionArc(arcrole, from, to, order, targetRole)
 }
 
-fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<XsdElement>) {
+fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<Element>) {
     list.forEach {
         if (!LocationContainer.list.containsKey(it.name)) {
-            val href = getRelatedHrefWithUnixSlash(path, it.xsdPath)
+            val href = when(it) {
+                is XsdElement -> getRelatedHrefWithUnixSlash(path, it.xsdPath)
+                is ExternalXsdElement -> it.uri
+            }
+
             val location = location("$href#${it.id}", it.name)
             LocationContainer.list[it.name] = location
         }
@@ -73,7 +78,7 @@ fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<XsdElement>) {
 fun getRelatedHrefWithUnixSlash(startPath: Path, relatedTo: Path) =
     startPath.parent.relativize(relatedTo).toString().replace('\\', '/')
 
-fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: XsdElement, to: XsdElement, order: String = "", targetRole:
+fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Element, to: Element, order: String = "", targetRole:
 InternalTaxonomyRole = InternalTaxonomyRole.NONE): DefinitionArc {
     createLocatorsIfMiss(listOf(from, to))
     return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order, targetRole.roleUri)
