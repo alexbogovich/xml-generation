@@ -9,6 +9,7 @@ import io.github.alexbogovich.xml.generation.model.XbrlPeriodType.*
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.DIMENSION_ITEM
 import io.github.alexbogovich.xml.generation.model.XbrlSubstitutionGroup.ITEM
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
+import io.github.alexbogovich.xml.writer.dsl.EmptyElementDsl
 import shared.AccountGroupCollection
 import shared.DictContainer
 import shared.ExternalElemensts
@@ -46,6 +47,9 @@ fun main(args: Array<String>) {
 //    generateDefinitionForAccountXsd()
 }
 
+val defaultDomainItem: EmptyElementDsl.() -> Unit = {
+    periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+}
 
 fun generateBalanceDomXsd() {
     val balanceStatementXsdPath: Path = Paths.get(dirStringPath).resolve(BALANCE_STATEMENT_MEM.location)
@@ -58,21 +62,10 @@ fun generateBalanceDomXsd() {
         targetNamespace(BALANCE_STATEMENT_MEM)
         import(listOf(XBRLI, MODEL, NONNUM))
 
-        DictContainer.incomingBalance = xsdElement("IncomingBalance") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-
-        DictContainer.outgoingBalance = xsdElement("OutgoingBalance") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-
-        DictContainer.revenueDebit = xsdElement("RevenueDebit") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-
-        DictContainer.revenueCredit = xsdElement("RevenueCredit") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
+        DictContainer.incomingBalance = xsdElement("IncomingBalance", defaultDomainItem)
+        DictContainer.outgoingBalance = xsdElement("OutgoingBalance", defaultDomainItem)
+        DictContainer.revenueDebit = xsdElement("RevenueDebit", defaultDomainItem)
+        DictContainer.revenueCredit = xsdElement("RevenueCredit", defaultDomainItem)
     }
 }
 
