@@ -19,19 +19,19 @@ object DictContainer {
     lateinit var balanceStatementDimension: XsdElement
     lateinit var accountGroupDimension: XsdElement
     lateinit var accountXsdElements: List<AccountXsdElement>
-    lateinit var totalAccountGroup: XsdElement
-    lateinit var balanceAccountGroup: XsdElement
-    lateinit var activeBalanceAccountGroup: XsdElement
-    lateinit var passiveBalanceAccountGroup: XsdElement
-    lateinit var trustAccountGroup: XsdElement
-    lateinit var activeTrustAccountGroup: XsdElement
-    lateinit var passiveTrustAccountGroup: XsdElement
-    lateinit var offBalanceAccountGroup: XsdElement
-    lateinit var activeOffBalanceAccountGroup: XsdElement
-    lateinit var passiveOffBalanceAccountGroup: XsdElement
-    lateinit var otherAccountGroup: XsdElement
-    lateinit var activeOtherAccountGroup: XsdElement
-    lateinit var passiveOtherAccountGroup: XsdElement
+    lateinit var accountGroupTotal: XsdElement
+    lateinit var accountGroupBalance: XsdElement
+    lateinit var accountGroupBalanceActive: XsdElement
+    lateinit var accountGroupBalancePassive: XsdElement
+    lateinit var accountGroupTrust: XsdElement
+    lateinit var accountGroupTrustActive: XsdElement
+    lateinit var accountGroupTrustPassive: XsdElement
+    lateinit var accountGroupOffbalance: XsdElement
+    lateinit var accountGroupOffbalanceActive: XsdElement
+    lateinit var accountGroupOffbalancePassive: XsdElement
+    lateinit var accountGroupOther: XsdElement
+    lateinit var accountGroupOtherActive: XsdElement
+    lateinit var accountGroupOtherPassive: XsdElement
 
 
 

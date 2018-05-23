@@ -111,6 +111,12 @@ fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole, lambda
     return DefinitionLink(taxonomyRole.roleUri)
 }
 
+fun DslXMLStreamWriter.addListOfRoleRef(taxonomyRoleList: List<InternalTaxonomyRole>, buildPath: Path) {
+    taxonomyRoleList.forEach {
+        roleRef(it, buildPath)
+    }
+}
+
 fun DslXMLStreamWriter.roleRef(taxonomyRole: InternalTaxonomyRole, buildPath: Path): RoleRef {
     val xsdWithRulePath = buildPath.resolve(taxonomyRole.taxomomyPath)
     val href = getRelatedHrefWithUnixSlash(path, xsdWithRulePath)
@@ -126,6 +132,16 @@ fun DslXMLStreamWriter.roleRef(href: String, roleURI: String): RoleRef {
         "roleURI" attr roleURI
     }
     return RoleRef(href, roleURI)
+}
+
+fun DslXMLStreamWriter.writeArrayOfAccounts(domain: XsdElement, accounts: List<AccountXsdElement>, group: Account.Group, type: Account
+.Type) {
+    accounts.asSequence()
+            .filter { it.account.group == group && it.account.type == type }
+            .map { it.xsdElement }
+            .forEachIndexed { index, location ->
+                definitionArc(ArcRole.DOMAIN_MEMBER, domain, location, "${index + 1}.0")
+            }
 }
 
 fun DslXMLStreamWriter.writeArrayOfAccounts(domain: Location, accounts: List<Account>, group: Account.Group, type: Account.Type) {

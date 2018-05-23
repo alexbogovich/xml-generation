@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
 
 
     generateDefinitionBalanceStatmentHier()
+    generateDefaultAccountGroupHierDefinition()
     generateDimensionDefinition()
 
 //    println("dict is = $DictContainer")
@@ -132,10 +133,10 @@ fun generateDefinitionBalanceStatmentHier() {
         roleRef(InternalTaxonomyRole.BS_DOM_IDCO, dirPath)
 
         definitionLink(InternalTaxonomyRole.BS_DOM_IDCO) {
-            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.incomingBalance, "1.0")
-            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.revenueDebit, "2.0")
-            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.revenueCredit, "3.0")
-            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.outgoingBalance, "4.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.balanceStatementDomain, DictContainer.incomingBalance, "1.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.balanceStatementDomain, DictContainer.revenueDebit, "2.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.balanceStatementDomain, DictContainer.revenueCredit, "3.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.balanceStatementDomain, DictContainer.outgoingBalance, "4.0")
         }
     }
 }
@@ -177,12 +178,18 @@ fun generateDimensionDefinition() {
 
         arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
         roleRef(InternalTaxonomyRole.BS_DOM_IDCO, dirPath)
+        roleRef(InternalTaxonomyRole.AG_TOTAL, dirPath)
         roleRef(InternalTaxonomyRole.AG_SET, dirPath)
         roleRef(InternalTaxonomyRole.BS_SET, dirPath)
 
         definitionLink(InternalTaxonomyRole.BS_SET) {
             definitionArc(DIMENSION_DOMAIN, DictContainer.balanceStatementDimension, DictContainer
-                    .balanceStatementDomain, "1.0", InternalTaxonomyRole.BS_SET)
+                    .balanceStatementDomain, "1.0", InternalTaxonomyRole.BS_DOM_IDCO)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_SET) {
+            definitionArc(DIMENSION_DOMAIN, DictContainer.accountGroupDimension, DictContainer
+                    .accountGroupDomain, "1.0", InternalTaxonomyRole.AG_TOTAL)
         }
 
 
@@ -215,46 +222,46 @@ fun generateAccountGroupDomXsd() {
         targetNamespace(ACCOUNT_GROUP_MEM)
         import(listOf(XBRLI, MODEL, NONNUM))
 
-        DictContainer.totalAccountGroup = xsdElement("TotalAccountGroup") {
+        DictContainer.accountGroupTotal = xsdElement("AccountGroupTotal") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.balanceAccountGroup = xsdElement("BalanceAccountGroup") {
+        DictContainer.accountGroupBalance = xsdElement("AccountGroupBalance") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.activeBalanceAccountGroup = xsdElement("ActiveBalanceAccountGroup") {
+        DictContainer.accountGroupBalanceActive = xsdElement("AccountGroupBalanceActive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.passiveBalanceAccountGroup = xsdElement("PassiveBalanceAccountGroup") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-
-        DictContainer.trustAccountGroup = xsdElement("TrustAccountGroup") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-        DictContainer.activeTrustAccountGroup = xsdElement("ActiveTrustAccountGroup") {
-            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
-        }
-        DictContainer.passiveTrustAccountGroup = xsdElement("PassiveTrustAccountGroup") {
+        DictContainer.accountGroupBalancePassive = xsdElement("AccountGroupBalancePassive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
-        DictContainer.offBalanceAccountGroup = xsdElement("OffBalanceAccountGroup") {
+        DictContainer.accountGroupTrust = xsdElement("AccountGroupTrust") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.activeOffBalanceAccountGroup = xsdElement("ActiveOffBalanceAccountGroup") {
+        DictContainer.accountGroupTrustActive = xsdElement("AccountGroupTrustActive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.passiveOffBalanceAccountGroup = xsdElement("PassiveOffBalanceAccountGroup") {
+        DictContainer.accountGroupTrustPassive = xsdElement("AccountGroupTrustPassive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
-        DictContainer.otherAccountGroup = xsdElement("OtherAccountGroup") {
+        DictContainer.accountGroupOffbalance = xsdElement("AccountGroupOffbalance") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.activeOtherAccountGroup = xsdElement("ActiveOtherAccountGroup") {
+        DictContainer.accountGroupOffbalanceActive = xsdElement("AccountGroupOffbalanceActive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
-        DictContainer.passiveOtherAccountGroup = xsdElement("PassiveOtherAccountGroup") {
+        DictContainer.accountGroupOffbalancePassive = xsdElement("AccountGroupOffbalancePassive") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+
+        DictContainer.accountGroupOther = xsdElement("AccountGroupOther") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.accountGroupOtherActive = xsdElement("AccountGroupOtherActive") {
+            periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
+        }
+        DictContainer.accountGroupOtherPassive = xsdElement("AccountGroupOtherPassive") {
             periodType(INSTANT); type(DOMAIN_ITEM_TYPE); substitutionGroup(ITEM); isNillable(); isAbstract()
         }
 
@@ -295,6 +302,108 @@ fun generateAccountGroupHierXsd() {
                     InternalTaxonomyRole.AG_OTHER_ACTIVE,
                     InternalTaxonomyRole.AG_OTHER_PASSIVE
                     ))
+        }
+    }
+}
+
+fun generateDefaultAccountGroupHierDefinition() {
+    val xierDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.ACCOUNT_GROUP_HIER_DEF.relatedPath)
+    xierDefPath.createIfNotExist()
+
+    println("open ${xierDefPath.toAbsolutePath()}")
+    val xierDefWriter = DslXMLStreamWriter(xierDefPath)
+
+    xierDefWriter.linkbase {
+        namespace(listOf(XSI, XLINK, LINK, XBRLDT, XBRLI))
+        arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+        addListOfRoleRef(
+                listOf(
+                        InternalTaxonomyRole.AG_TOTAL,
+                        InternalTaxonomyRole.AG_BALANCE,
+                        InternalTaxonomyRole.AG_BALANCE_ACTIVE,
+                        InternalTaxonomyRole.AG_BALANCE_PASSIVE,
+                        InternalTaxonomyRole.AG_TRUST,
+                        InternalTaxonomyRole.AG_TRUST_ACTIVE,
+                        InternalTaxonomyRole.AG_TRUST_PASSIVE,
+                        InternalTaxonomyRole.AG_OFFBALANCE,
+                        InternalTaxonomyRole.AG_OFFBALANCE_ACTIVE,
+                        InternalTaxonomyRole.AG_OFFBALANCE_PASSIVE,
+                        InternalTaxonomyRole.AG_OTHER,
+                        InternalTaxonomyRole.AG_OTHER_ACTIVE,
+                        InternalTaxonomyRole.AG_OTHER_PASSIVE
+                ), dirPath
+        )
+
+        definitionLink(InternalTaxonomyRole.AG_TOTAL) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain,
+                    DictContainer.accountGroupBalance, "1.0", InternalTaxonomyRole.AG_BALANCE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain,
+                    DictContainer.accountGroupTrust, "2.0", InternalTaxonomyRole.AG_TRUST)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain,
+                    DictContainer.accountGroupOffbalance, "3.0", InternalTaxonomyRole.AG_OFFBALANCE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain,
+                    DictContainer.accountGroupOther, "4.0", InternalTaxonomyRole.AG_OTHER)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_BALANCE) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupBalance,
+                    DictContainer.accountGroupBalanceActive, "1.0", InternalTaxonomyRole.AG_BALANCE_ACTIVE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupBalance,
+                    DictContainer.accountGroupBalancePassive, "2.0", InternalTaxonomyRole.AG_BALANCE_PASSIVE)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_TRUST) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupTrust,
+                    DictContainer.accountGroupTrustActive, "1.0", InternalTaxonomyRole.AG_TRUST_ACTIVE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupTrust,
+                    DictContainer.accountGroupTrustPassive, "2.0", InternalTaxonomyRole.AG_TRUST_PASSIVE)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_OFFBALANCE) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupOffbalance,
+                    DictContainer.accountGroupOffbalanceActive, "1.0", InternalTaxonomyRole.AG_OFFBALANCE_ACTIVE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupOffbalance,
+                    DictContainer.accountGroupOffbalancePassive, "2.0", InternalTaxonomyRole.AG_OFFBALANCE_PASSIVE)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_OTHER) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupOther,
+                    DictContainer.accountGroupOtherActive, "1.0", InternalTaxonomyRole.AG_OTHER_ACTIVE)
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupOther,
+                    DictContainer.accountGroupOtherPassive, "2.0", InternalTaxonomyRole.AG_OTHER_PASSIVE)
+        }
+
+        definitionLink(InternalTaxonomyRole.AG_BALANCE_ACTIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupBalanceActive, DictContainer.accountXsdElements,
+                    Account.Group.BALANCE, Account.Type.ACTIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_BALANCE_PASSIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupBalancePassive, DictContainer.accountXsdElements,
+                    Account.Group.BALANCE, Account.Type.PASSIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_TRUST_ACTIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupTrustActive, DictContainer.accountXsdElements,
+                    Account.Group.TRUST, Account.Type.ACTIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_TRUST_PASSIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupTrustPassive, DictContainer.accountXsdElements,
+                    Account.Group.TRUST, Account.Type.PASSIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_OFFBALANCE_ACTIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupOffbalanceActive, DictContainer.accountXsdElements,
+                    Account.Group.OFFBALANCE, Account.Type.ACTIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_OFFBALANCE_PASSIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupOffbalancePassive, DictContainer.accountXsdElements,
+                    Account.Group.OFFBALANCE, Account.Type.PASSIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_OTHER_ACTIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupOtherActive, DictContainer.accountXsdElements,
+                    Account.Group.OTHER, Account.Type.ACTIVE)
+        }
+        definitionLink(InternalTaxonomyRole.AG_OTHER_PASSIVE) {
+            writeArrayOfAccounts(DictContainer.accountGroupOtherPassive, DictContainer.accountXsdElements,
+                    Account.Group.OTHER, Account.Type.PASSIVE)
         }
     }
 }
