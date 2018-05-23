@@ -1,5 +1,6 @@
 package shared
 
+import io.github.alexbogovich.xml.generation.model.Location
 import io.github.alexbogovich.xml.generation.model.XsdElement
 
 object DictContainer {
@@ -18,4 +19,8 @@ object DictContainer {
                 "balanceStatementDomain = $balanceStatementDomain\n" +
                 "accountGroupDomain = $accountGroupDomain}"
     }
+}
+
+object LocationContainer {
+    val list: MutableMap<String, Location> = hashMapOf()
 }

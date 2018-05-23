@@ -1,7 +1,7 @@
 package io.github.alexbogovich.xml.generation.model
 
 enum class InternalTaxonomyRole(val id: String,
-                                val roleName: String,
+                                val roleUri: String,
                                 val taxomomyPath: String,
                                 val defLink: Boolean = true,
                                 val labelLink: Boolean = false) {

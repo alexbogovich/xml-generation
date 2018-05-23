@@ -18,15 +18,21 @@ import java.nio.file.Paths
 import javax.xml.stream.XMLOutputFactory
 
 var dirStringPath = System.getProperty("user.dir")!! + "\\build\\schema"
+var dirPath: Path = Paths.get(dirStringPath)
 
 fun main(args: Array<String>) {
     if (args.isNotEmpty()) {
         dirStringPath = args[0]
+        dirPath = Paths.get(dirStringPath)
     }
 
     generateBalanceDomXsd()
     generateBalanceHierXsd()
     generateExplicitDomainXsd()
+
+
+
+    generateDefinitionBalanceStatmentHier()
 
     println("dict is = $DictContainer")
 //    generateDefinitionForAccountXsd()
@@ -124,6 +130,36 @@ fun getLinkBaseRefPath(linkbase: LinkbaseEnum, path: Path): String {
     val result = path.parent.relativize(linkbasePath)
     println("result = $result")
     return result.toString()
+}
+
+fun generateDefinitionBalanceStatmentHier() {
+    val xierDefPath: Path = Paths.get(dirStringPath).resolve(LinkbaseEnum.BALANCE_STATEMENT_HIER_DEF.relatedPath)
+    xierDefPath.toFile().run {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            println("create ${xierDefPath.toAbsolutePath()}")
+            createNewFile()
+        }
+    }
+
+    println("open ${xierDefPath.toAbsolutePath()}")
+    val xierDefWriter = DslXMLStreamWriter(xierDefPath)
+
+    xierDefWriter.linkbase {
+        namespace(listOf(XSI, XLINK, LINK))
+
+        arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+        roleRef(InternalTaxonomyRole.BS_DOM_IDCO, dirPath)
+
+        definitionLink(InternalTaxonomyRole.BS_DOM_IDCO) {
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.incomingBalance, "1.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.revenueDebit, "2.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.revenueCredit, "3.0")
+            definitionArc(DOMAIN_MEMBER, DictContainer.accountGroupDomain, DictContainer.outgoingBalance, "4.0")
+        }
+
+
+    }
 }
 
 fun generateDefinitionForAccountXsd() {

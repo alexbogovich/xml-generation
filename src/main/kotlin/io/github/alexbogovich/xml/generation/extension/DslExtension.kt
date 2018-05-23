@@ -3,6 +3,8 @@ package io.github.alexbogovich.xml.generation.extension
 import io.github.alexbogovich.xml.generation.model.*
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import io.github.alexbogovich.xml.writer.dsl.EmptyElementDsl
+import shared.LocationContainer
+import java.nio.file.Path
 
 fun DslXMLStreamWriter.xsdSchema(lambda: DslXMLStreamWriter.() -> Unit) {
     document {
@@ -18,6 +20,10 @@ fun DslXMLStreamWriter.linkbase(lambda: DslXMLStreamWriter.() -> Unit) {
             this.lambda()
         }
     }
+}
+
+fun DslXMLStreamWriter.arcroleRef(arcroleRef: ArcroleRef) {
+    arcroleRef(arcroleRef.arcroleURI, arcroleRef.href)
 }
 
 fun DslXMLStreamWriter.arcroleRef(arcroleURI: String, href: String) {
@@ -54,11 +60,32 @@ String = ""): DefinitionArc {
     return DefinitionArc(arcrole, from, to, order, targetRole)
 }
 
+fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<XsdElement>) {
+    list.forEach {
+        if (!LocationContainer.list.containsKey(it.name)) {
+            val href = getRelatedHrefWithUnixSlash(path, it.xsdPath)
+            val location = location("$href#${it.id}", it.name)
+            LocationContainer.list[it.name] = location
+        }
+    }
+}
+
+fun getRelatedHrefWithUnixSlash(startPath: Path, relatedTo: Path) =
+    startPath.parent.relativize(relatedTo).toString().replace('\\', '/')
+
+fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: XsdElement, to: XsdElement, order: String = "", targetRole:
+RoleRef = RoleRef("", "")): DefinitionArc {
+    createLocatorsIfMiss(listOf(from, to))
+    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order,
+            targetRole)
+}
+
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
 RoleRef = RoleRef("", "")): DefinitionArc {
     return this.definitionArc(arcrole, from.label, to.label, order, targetRole.roleURI)
 }
 
+@Deprecated(message = "remove id")
 fun DslXMLStreamWriter.definitionLink(role: RoleRef, id: String, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
     "link:definitionLink" {
         "xlink:type" attr "extended"
@@ -69,6 +96,25 @@ fun DslXMLStreamWriter.definitionLink(role: RoleRef, id: String, lambda: DslXMLS
     return DefinitionLink(role.roleURI, id)
 }
 
+fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
+    "link:definitionLink" {
+        "xlink:type" attr "extended"
+        "xlink:role" attr taxonomyRole.roleUri
+        LocationContainer.list.clear()
+        this.lambda()
+        LocationContainer.list.clear()
+    }
+    return DefinitionLink(taxonomyRole.roleUri)
+}
+
+fun DslXMLStreamWriter.roleRef(taxonomyRole: InternalTaxonomyRole, buildPath: Path): RoleRef {
+    val xsdWithRulePath = buildPath.resolve(taxonomyRole.taxomomyPath)
+    val href = getRelatedHrefWithUnixSlash(path, xsdWithRulePath)
+
+    return roleRef("$href#${taxonomyRole.id}", taxonomyRole.roleUri)
+}
+
+@Deprecated(message = "use InternalTaxonomyRole")
 fun DslXMLStreamWriter.roleRef(href: String, roleURI: String): RoleRef {
     "link:roleRef" emptyElement  {
         "xlink:type" attr "simple"
@@ -141,7 +187,7 @@ fun DslXMLStreamWriter.linkbaseRef(href: String, type: LinkBaseRefType) {
 fun DslXMLStreamWriter.defineRoleList(list:List<InternalTaxonomyRole>) {
     list.forEach {
         "link:roleType" {
-            "roleURI" attr it.roleName
+            "roleURI" attr it.roleUri
             "id" attr it.id
             if (it.defLink) {
                 "link:usedOn"("link:definitionLink")

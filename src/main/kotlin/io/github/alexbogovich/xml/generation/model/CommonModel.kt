@@ -29,7 +29,7 @@ enum class ArcroleRef(val arcroleURI: String, val href: String) {
 
 data class Location(val href: String, val label: String)
 data class DefinitionArc(val arcrole: ArcRole, val from: String, val to: String, val order: String = "", val targetRole: String = "")
-data class DefinitionLink(val role: String, val id: String)
+data class DefinitionLink(val role: String, var id: String = "")
 data class RoleRef(val href: String, val roleURI: String) // use URI?
 enum class XbrlPeriodAttr(val value: String) {
     INSTANT("instant"),
