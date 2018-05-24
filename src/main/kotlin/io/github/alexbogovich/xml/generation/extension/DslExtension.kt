@@ -2,9 +2,9 @@ package io.github.alexbogovich.xml.generation.extension
 
 import io.github.alexbogovich.xml.generation.utils.getLinkBaseRefPath
 import io.github.alexbogovich.xml.generation.model.*
+import io.github.alexbogovich.xml.generation.shared.LocationContainer
 import io.github.alexbogovich.xml.writer.dsl.DslXMLStreamWriter
 import io.github.alexbogovich.xml.writer.dsl.EmptyElementDsl
-import io.github.alexbogovich.xml.generation.shared.LocationContainer
 import io.github.alexbogovich.xml.generation.utils.getRelatedHrefWithUnixSlash
 import java.nio.file.Path
 
@@ -64,27 +64,6 @@ String = "", closed: Boolean): DefinitionArc {
     return DefinitionArc(arcrole, from, to, order, targetRole)
 }
 
-fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<Element>) {
-    list.forEach {
-        if (!LocationContainer.list.containsKey(it.name)) {
-            val href = when(it) {
-                is XsdElement -> getRelatedHrefWithUnixSlash(path, it.xsdPath)
-                is ExternalXsdElement -> it.uri
-            }
-
-            val location = location("$href#${it.id}", it.name)
-            LocationContainer.list[it.name] = location
-        }
-    }
-}
-
-fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Element, to: Element, order: String = "", targetRole:
-InternalTaxonomyRole = InternalTaxonomyRole.NONE, closed: Boolean = false): DefinitionArc {
-    createLocatorsIfMiss(listOf(from, to))
-    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order,
-            targetRole.roleUri, closed)
-}
-
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
 String, closed: Boolean = false): DefinitionArc {
     return this.definitionArc(arcrole, from.label, to.label, order, targetRole, closed)
@@ -95,13 +74,12 @@ RoleRef = RoleRef("", ""), closed: Boolean = false): DefinitionArc {
     return this.definitionArc(arcrole, from.label, to.label, order, targetRole.roleURI, closed)
 }
 
-fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
+fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole,
+                                      lambda: LocationAwareDefinitionLink.() -> Unit): DefinitionLink {
     "link:definitionLink" {
         "xlink:type" attr "extended"
         "xlink:role" attr taxonomyRole.roleUri
-        LocationContainer.list.clear()
-        this.lambda()
-        LocationContainer.list.clear()
+        LocationAwareDefinitionLink(this, LocationContainer()).lambda()
     }
     return DefinitionLink(taxonomyRole.roleUri)
 }
@@ -123,16 +101,6 @@ fun DslXMLStreamWriter.roleRef(taxonomyRole: InternalTaxonomyRole, buildPath: Pa
         "roleURI" attr taxonomyRole.roleUri
     }
     return RoleRef(href, taxonomyRole.roleUri)
-}
-
-fun DslXMLStreamWriter.writeArrayOfAccounts(domain: XsdElement, accounts: List<AccountXsdElement>, group: Account.Group, type: Account
-.Type) {
-    accounts.asSequence()
-            .filter { it.account.group == group && it.account.type == type }
-            .map { it.xsdElement }
-            .forEachIndexed { index, location ->
-                definitionArc(ArcRole.DOMAIN_MEMBER, domain, location, "${index + 1}.0")
-            }
 }
 
 fun DslXMLStreamWriter.namespace(ns: NamespaceEnum) = this.namespace(ns.prefix, ns.link)

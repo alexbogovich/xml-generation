@@ -43,8 +43,8 @@ object DictContainer {
     }
 }
 
-object LocationContainer {
-    val list: MutableMap<String, Location> = hashMapOf()
+class LocationContainer {
+    val locationMap: MutableMap<String, Location> = hashMapOf()
 }
 
 object AccountGroupCollection {
