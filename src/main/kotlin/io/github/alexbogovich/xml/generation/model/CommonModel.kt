@@ -27,12 +27,12 @@ enum class ArcRole(val url: String) {
 }
 
 enum class ArcroleRef(val arcroleURI: String, val href: String) {
-    ALL(ArcRole.HYPERCUBE_ALL.url, "$XBRLDT#all"),
-    NOT_ALL(ArcRole.HYPERCUBE_NOT_ALL.url, "$XBRLDT#notAll"),
-    DIMENSION_DEFAULT(ArcRole.DOMAIN_MEMBER.url, "$XBRLDT#dimension-default"),
-    DIMENSION_DOMAIN(ArcRole.DIMENSION_DOMAIN.url, "$XBRLDT#dimension-domain"),
-    DOMAIN_MEMBER(ArcRole.DOMAIN_MEMBER.url, "$XBRLDT#domain-member"),
-    HYPERCUBE_DIMENSION(ArcRole.HYPERCUBE_DIMENSION.url, "$XBRLDT#hypercube-dimension")
+    ALL(ArcRole.HYPERCUBE_ALL.url, "${XBRLDT.location}#all"),
+    NOT_ALL(ArcRole.HYPERCUBE_NOT_ALL.url, "${XBRLDT.location}#notAll"),
+    DIMENSION_DEFAULT(ArcRole.DOMAIN_MEMBER.url, "${XBRLDT.location}#dimension-default"),
+    DIMENSION_DOMAIN(ArcRole.DIMENSION_DOMAIN.url, "${XBRLDT.location}#dimension-domain"),
+    DOMAIN_MEMBER(ArcRole.DOMAIN_MEMBER.url, "${XBRLDT.location}#domain-member"),
+    HYPERCUBE_DIMENSION(ArcRole.HYPERCUBE_DIMENSION.url, "${XBRLDT.location}#hypercube-dimension")
 }
 
 data class Location(val href: String, val label: String)

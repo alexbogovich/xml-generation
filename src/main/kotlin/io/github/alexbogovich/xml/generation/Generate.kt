@@ -99,7 +99,7 @@ fun generateBalanceHierDefinition() {
             .linkbase {
                 namespace(listOf(XSI, XLINK, LINK))
 
-                arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+                arcroleRef(ArcroleRef.DOMAIN_MEMBER)
                 roleRef(BS_DOM_IDCO, dirPath)
 
                 definitionLink(BS_DOM_IDCO) {
@@ -155,8 +155,6 @@ fun generateDimensionDefinition() {
                     definitionArc(DIMENSION_DOMAIN, DictContainer.accountGroupDimension, DictContainer
                             .accountGroupDomain, "1.0", AG_TOTAL)
                 }
-
-
             }
 }
 
@@ -230,7 +228,7 @@ fun generateAccountGroupHierDefinition() {
             .getDslSteamWriter()
             .linkbase {
                 namespace(listOf(XSI, XLINK, LINK, XBRLDT, XBRLI))
-                arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+                arcroleRef(ArcroleRef.DOMAIN_MEMBER)
                 addListOfRoleRef(accountGroupNestedRoles, dirPath)
 
                 definitionLink(AG_TOTAL) {
@@ -324,8 +322,7 @@ fun generateMetricXsd() {
                     periodType(INSTANT); type(MONETARY_ITEM_TYPE); substitutionGroup(ITEM); isNillable()
                 }
 
-                MetricContainer
-                        .assetForeignCurrencyOrPreciousMetals = xsdElement("AssetForeignCurrencyOrPreciousMetals") {
+                MetricContainer.assetForeignCurrencyOrPreciousMetals = xsdElement("AssetForeignCurrencyOrPreciousMetals") {
                     periodType(INSTANT); type(MONETARY_ITEM_TYPE); substitutionGroup(ITEM); isNillable()
                 }
 
@@ -355,12 +352,12 @@ fun generateMetricDefinition() {
             .linkbase {
                 namespace(listOf(XSI, XLINK, LINK, XBRLDT))
 
-                arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+                arcroleRef(ArcroleRef.DOMAIN_MEMBER)
                 roleRef(MET_ASSET_NF, dirPath)
 
                 definitionLink(MET_ASSET_NF) {
-                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal, MetricContainer.assetNationalCurrency, "1.0")
-                    definitionArc(DIMENSION_DOMAIN, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
+                    definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetNationalCurrency, "1.0")
+                    definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
                 }
             }
 }
@@ -388,6 +385,7 @@ fun generateForm101Definition() {
                 namespace(listOf(XSI, XLINK, LINK, XBRLDT))
 
                 arcroleRef(ArcroleRef.DIMENSION_DOMAIN)
+                arcroleRef(ArcroleRef.DOMAIN_MEMBER)
                 arcroleRef(ArcroleRef.ALL)
                 arcroleRef(ArcroleRef.HYPERCUBE_DIMENSION)
 
@@ -402,7 +400,10 @@ fun generateForm101Definition() {
                     definitionArc(HYPERCUBE_DIMENSION, ExternalElemensts.hyp,
                             DictContainer.balanceStatementDimension, "2.0", BS_SET)
                     definitionArc(HYPERCUBE_ALL, MetricContainer.assetTotal,
-                            ExternalElemensts.hyp, "1.0", MET_ASSET_NF)
+                            ExternalElemensts.hyp, "1.0", closed = true)
+
+                    definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetNationalCurrency, "1.0")
+                    definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
                 }
             }
 }

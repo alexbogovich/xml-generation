@@ -50,7 +50,7 @@ fun DslXMLStreamWriter.location(href: String, label: String): Location {
 }
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: String, to: String, order: String = "", targetRole:
-String = ""): DefinitionArc {
+String = "", closed: Boolean): DefinitionArc {
     "link:definitionArc" emptyElement {
         "xlink:type" attr "arc"
         "xlink:arcrole" attr arcrole.url
@@ -59,6 +59,7 @@ String = ""): DefinitionArc {
         if (!order.isEmpty()) "order" attr order
         if (!targetRole.isEmpty()) "xbrldt:targetRole" attr targetRole
         if (arcrole == ArcRole.HYPERCUBE_ALL) "xbrldt:contextElement" attr "scenario"
+        if (closed) "xbrldt:closed" attr "true"
     }
     return DefinitionArc(arcrole, from, to, order, targetRole)
 }
@@ -78,19 +79,20 @@ fun DslXMLStreamWriter.createLocatorsIfMiss(list: List<Element>) {
 }
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Element, to: Element, order: String = "", targetRole:
-InternalTaxonomyRole = InternalTaxonomyRole.NONE): DefinitionArc {
+InternalTaxonomyRole = InternalTaxonomyRole.NONE, closed: Boolean = false): DefinitionArc {
     createLocatorsIfMiss(listOf(from, to))
-    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order, targetRole.roleUri)
+    return definitionArc(arcrole, LocationContainer.list[from.name]!!, LocationContainer.list[to.name]!!, order,
+            targetRole.roleUri, closed)
 }
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
-String): DefinitionArc {
-    return this.definitionArc(arcrole, from.label, to.label, order, targetRole)
+String, closed: Boolean = false): DefinitionArc {
+    return this.definitionArc(arcrole, from.label, to.label, order, targetRole, closed)
 }
 
 fun DslXMLStreamWriter.definitionArc(arcrole: ArcRole, from: Location, to: Location, order: String = "", targetRole:
-RoleRef = RoleRef("", "")): DefinitionArc {
-    return this.definitionArc(arcrole, from.label, to.label, order, targetRole.roleURI)
+RoleRef = RoleRef("", ""), closed: Boolean = false): DefinitionArc {
+    return this.definitionArc(arcrole, from.label, to.label, order, targetRole.roleURI, closed)
 }
 
 fun DslXMLStreamWriter.definitionLink(taxonomyRole: InternalTaxonomyRole, lambda: DslXMLStreamWriter.() -> Unit): DefinitionLink {
