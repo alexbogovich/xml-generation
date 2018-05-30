@@ -35,6 +35,7 @@ fun main(args: Array<String>) {
     generateMetricXsd()
     generateMetricHierXsd()
     generateForm101Xsd()
+    generateCommonEP()
 
     generateBalanceHierDefinition()
     generateAccountGroupHierDefinition()
@@ -405,5 +406,16 @@ fun generateForm101Definition() {
                     definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetNationalCurrency, "1.0")
                     definitionArc(DOMAIN_MEMBER, MetricContainer.assetTotal, MetricContainer.assetForeignCurrencyOrPreciousMetals, "2.0")
                 }
+            }
+}
+
+fun generateCommonEP() {
+    EP_COMMON.location
+            .getDslSteamWriter()
+            .xsdSchema {
+                namespace(listOf(XSI, XBRLI, FORM_101, EP_COMMON))
+                defaultNamespace(XSD)
+                targetNamespace(EP_COMMON)
+                import(listOf(XBRLI, FORM_101))
             }
 }

@@ -36,6 +36,8 @@ enum class NamespaceEnum(val prefix: String, val link: String, val location: Str
 
     FORM_101("form_101", "http://$taxonomyPath/rep/$initDate/tab/form_101",
             "$taxonomyPath/rep/$initDate/tab/form_101/form_101.xsd", true),
+    EP_COMMON("ep_common", "http://$taxonomyPath/rep/$initDate/ep/ep_common",
+            "$taxonomyPath/rep/$initDate/ep/ep_common.xsd", true)
     ;
 
     companion object {
